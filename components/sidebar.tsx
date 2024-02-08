@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import {
   Select,
   SelectContent,
@@ -7,24 +6,41 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import getFilteredData from "../actions/getFilteredData";
+interface SidebarProps {
+  handleSetFuelType: (newState: string) => void;
+  handleSetPriceDiff: (newState: string) => void;
+  handleSetDistance: (newState: string) => void;
+  handleSetTopNum: (newState: string) => void;
+  handleSetRule: (newState: string) => void;
+  fuelType: string;
+  priceDiff: string;
+  distance: string;
+  topNum: string;
+  rule: string;
+  targetStation?: Store | any;
+}
 
-export default function Sidebar() {
-  const [fuelType, setFuelType] = useState("E10");
-  const [priceDiff, setPriceDiff] = useState("25");
-  const [topNear, setTopNear] = useState(5);
-
-  useEffect(() => {
-    getFilteredData()
-      .then((data) => console.log(data))
-      .catch((error) => console.error("Failed to fetch data: ", error));
-  }, [fuelType, priceDiff, topNear]);
-
+export default function Sidebar({
+  handleSetFuelType,
+  handleSetPriceDiff,
+  handleSetDistance,
+  handleSetTopNum,
+  handleSetRule,
+  fuelType,
+  priceDiff,
+  distance,
+  topNum,
+  rule,
+  targetStation,
+}: SidebarProps) {
   return (
     <>
-      <div className="w-[100%] flex justify-center mb-5">
+      <div className="w-[100%] flex justify-center ">
         {/* fuel type */}
-        <Select value={fuelType} onValueChange={(value) => setFuelType(value)}>
+        <Select
+          value={fuelType}
+          onValueChange={(value) => handleSetFuelType(value)}
+        >
           <SelectTrigger>
             <SelectValue placeholder="fuel type" />
           </SelectTrigger>
@@ -39,7 +55,7 @@ export default function Sidebar() {
         {/* price diff */}
         <Select
           value={priceDiff}
-          onValueChange={(value) => setPriceDiff(value)}
+          onValueChange={(value) => handleSetPriceDiff(value)}
         >
           <SelectTrigger>
             <SelectValue placeholder="price diff" />
@@ -57,20 +73,62 @@ export default function Sidebar() {
           </SelectContent>
         </Select>
       </div>
+      <Select
+        value={distance}
+        onValueChange={(value) => handleSetDistance(value)}
+      >
+        <SelectTrigger className="w-[100%]">
+          <SelectValue placeholder="Distance" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="5">5km</SelectItem>
+          <SelectItem value="10">10km</SelectItem>
+          <SelectItem value="15">15km</SelectItem>
+          <SelectItem value="20">20km</SelectItem>
+        </SelectContent>
+      </Select>
 
-      <h1 className="flex items-center text-center text-[1vw]">
-        Top{" "}
-        <input
-          style={{ width: "3vw", textAlign: "center" }}
-          type="number"
-          defaultValue={topNear}
-          onChange={(e) => {
-            setTopNear(Number(e.target.value));
-            console.log(topNear);
-          }}
-        />
-        Nearest station
-      </h1>
+      <div className="text-center mt-5">
+        <h1>Target Station</h1>
+        {targetStation ? (
+          <div>
+            <h1>{targetStation[0].name}</h1>
+            <h1>
+              {targetStation[0].state} {targetStation[0].postCode}
+            </h1>
+            <h1>{targetStation[0].suburb}</h1>
+          </div>
+        ) : (
+          "Target Station net set"
+        )}
+      </div>
+      {/* <h1 className="flex items-center text-center text-[0.8vw]">
+        Top
+        <Select
+          value={topNum}
+          onValueChange={(value) => handleSetTopNum(value)}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="rank" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="5">5</SelectItem>
+            <SelectItem value="15">10</SelectItem>
+            <SelectItem value="15">15</SelectItem>
+            <SelectItem value="20">20</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={rule} onValueChange={(value) => handleSetRule(value)}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="rule" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="nearest">nearest</SelectItem>
+            <SelectItem value="cheapest">cheapest</SelectItem>
+          </SelectContent>
+        </Select>
+        station
+      </h1> */}
     </>
   );
 }

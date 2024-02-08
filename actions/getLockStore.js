@@ -27,24 +27,18 @@ function calculateBoundingBox(lat, lng, distance) {
   return { neLat, neLng, swLat, swLng };
 }
 
-export default async function getFilteredData(
+export default async function getLockStore(
   fuelType,
-  priceDiff,
-  topNum,
-  rule,
-  latlng,
-  scope
+  targetLatLng,
+  targetPrice
 ) {
-  console.log(fuelType, priceDiff, topNum, rule, latlng, scope);
-  // const scope = 5;
-  const { lat, lng } = latlng;
-  // 获取当前时间的时间戳
+  const { x: lng, y: lat } = targetLatLng;
   let timestamp = Date.now();
-
-  // 为了模拟两个不同的时间戳，我们可以在第一个基础上加减一些毫秒
-  // 这里，我们仅作演示，实际上可以直接使用timestamp作为两个参数
+  console.log("====================================");
+  console.log(targetPrice);
+  console.log("====================================");
   let timestampForCacheBusting = timestamp - 1000; // 比实际时间戳小1000毫秒
-  const box = calculateBoundingBox(lat, lng, Number(scope));
+  const box = calculateBoundingBox(lat, lng, 20);
   const { neLat, neLng, swLat, swLng } = box;
   try {
     const res = await fetch(
@@ -55,7 +49,10 @@ export default async function getFilteredData(
     }
     const data = await res.json();
     const filteredData = data.message.list.filter(
-      (list) => list.brand === "SEVENELEVEN"
+      (list) =>
+        list.brand === "SEVENELEVEN" &&
+        list.prices[fuelType] !== undefined &&
+        list.prices[fuelType].amount + 25 <= targetPrice
     );
     return filteredData;
   } catch (error) {
